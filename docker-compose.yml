@@ -1,0 +1,168 @@
+version: '3.8'
+
+services:
+  # --- 1. DATABASE FOR AI (POSTGRES + PGVECTOR) ---
+  fn_postgres:
+    image: pgvector/pgvector:pg16
+    container_name: fn_postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=finnexus
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d finnexus"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - finnexus_net
+
+  # --- 2. DATA LAKE (MINIO) ---
+  fn_minio:
+    image: minio/minio
+    container_name: fn-minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - finnexus_net
+
+  # --- 3. STREAMING CORE (REDPANDA) ---
+  fn_redpanda:
+    image: redpandadata/redpanda:latest
+    container_name: fn_redpanda
+    # 👇 ĐÃ SỬA: Viết command thành 1 dòng để tránh lỗi parse arguments
+    command: >
+      redpanda start
+      --smp 1
+      --memory 1G
+      --reserve-memory 0M
+      --overprovisioned
+      --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      --advertise-kafka-addr internal://fn_redpanda:9092,external://localhost:19092
+      --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
+      --advertise-pandaproxy-addr internal://fn_redpanda:8082,external://localhost:18082
+    ports:
+      - "18082:18082"
+      - "19092:19092"
+    volumes:
+      - redpanda_data:/var/lib/redpanda/data
+    networks:
+      - finnexus_net
+
+  # UI quản lý Redpanda
+  fn_redpanda_console:
+    image: redpandadata/console:latest
+    container_name: fn_redpanda_console
+    restart: on-failure
+    entrypoint: /bin/sh
+    command: -c 'echo "$$CONSOLE_CONFIG_FILE" > /tmp/config.yaml; /app/console'
+    environment:
+      CONFIG_FILEPATH: /tmp/config.yaml
+      CONSOLE_CONFIG_FILE: |
+        kafka:
+          brokers: ["fn_redpanda:9092"]
+    ports:
+      - "8080:8080"
+    depends_on:
+      - fn_redpanda
+    networks:
+      - finnexus_net
+
+  # --- 4. ORCHESTRATION (MAGE.AI) ---
+  fn_mage:
+    build:
+      context: ./services/mage
+      dockerfile: Dockerfile
+    container_name: fn_mage
+    # 👇 ĐÃ SỬA: Đảm bảo tên project thống nhất
+    command: mage start finnexus
+    environment:
+      - USER_CODE_PATH=/home/src/finnexus
+      - POSTGRES_CONNECTION_URL=postgresql://admin:admin@fn_postgres:5432/finnexus
+      - REQUIRE_USER_AUTHENTICATION=0
+    ports:
+      - "6789:6789"
+    volumes:
+      - ./orchestration:/home/src
+      # Mount thêm docker sock để Mage chạy được block Docker (nếu cần)
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    networks:
+      - finnexus_net
+
+  # --- 5. VISUALIZATION (METABASE) ---
+  fn_metabase:
+    image: metabase/metabase:latest
+    container_name: fn_metabase
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - MB_DB_FILE=/metabase-data/metabase.db
+    volumes:
+      - metabase_data:/metabase-data
+    networks:
+      - finnexus_net
+
+  # --- 6. DATA CRAWLER ---
+  fn_crawler:
+    build: 
+      context: ./services/crawler-go
+      dockerfile: Dockerfile
+    image: fn_crawler
+    container_name: fn_crawler
+    depends_on:
+      - fn_redpanda
+    environment:
+      - KAFKA_BROKERS=fn_redpanda:9092
+      - KAFKA_TOPIC=financial_news
+      - APP_ENV=production
+      - TARGET_DOMAIN=cafef.vn
+    networks:
+      - finnexus_net
+
+  # --- 7. DASHBOARD (STREAMLIT) ---
+  fn_dashboard:
+    build: 
+      context: ./services/dashboard
+      dockerfile: Dockerfile
+    container_name: fn_dashboard
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    environment:
+      # 👇 Quan trọng: Đây là tên service DB trong mạng nội bộ Docker
+      - DB_HOST=fn_postgres 
+      - DB_USER=admin
+      - DB_PASS=admin
+      - DB_NAME=finnexus
+    depends_on:
+      - fn_postgres
+    networks:
+      - finnexus_net
+    volumes:
+      # Mount code để sửa nóng (Hot reload) không cần rebuild
+      - ./services/dashboard:/app
+
+volumes:
+  postgres_data:
+  minio_data:
+  redpanda_data:
+  metabase_data:
+
+networks:
+  finnexus_net:
+    driver: bridge

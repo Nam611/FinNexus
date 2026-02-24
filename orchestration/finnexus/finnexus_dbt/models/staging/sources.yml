@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: finnexus_raw
+    database: finnexus
+    schema: public
+    tables:
+      - name: news_articles # Đây là bảng do Crawler tạo ra

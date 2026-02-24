@@ -1,0 +1,5 @@
+# Dockerfile.mage
+FROM mageai/mageai:latest
+
+# Cài đặt các thư viện Python cần thiết vĩnh viễn
+RUN pip install --no-cache-dir docker psycopg2-binary pandas

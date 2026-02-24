@@ -1,0 +1,1 @@
+{"article_id": "str", "source_name": "str", "title": "str", "content": "str", "published_at": "datetime64[ns]", "collected_at": "datetime64[ns]", "sentiment_score": "Decimal", "sentiment_label": "str"}

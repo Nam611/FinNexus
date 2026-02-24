@@ -1,0 +1,14 @@
+minio
+docker
+transformers
+numpy
+torch --index-url https://download.pytorch.org/whl/cpu
+mage-ai
+psycopg2-binary
+pandas
+sqlalchemy
+beautifulsoup4
+requests
+lxml
+scikit-learn
+vnstock

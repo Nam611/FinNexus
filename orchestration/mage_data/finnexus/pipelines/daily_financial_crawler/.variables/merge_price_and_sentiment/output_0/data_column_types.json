@@ -1,0 +1,1 @@
+{"Date": "datetime64[ns]", "Ticker": "str", "Stock_Price": "float64", "Sentiment_Score": "float64", "News_Count": "int64"}

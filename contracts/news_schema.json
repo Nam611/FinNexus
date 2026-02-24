@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Vietnam Financial News Article",
+  "description": "Cấu trúc chuẩn cho tin tức tài chính crawl từ CafeF, Vietstock, v.v.",
+  "type": "object",
+  "required": ["source_id", "url", "title", "content_raw", "published_at", "crawled_at"],
+  "properties": {
+    "source_id": {
+      "type": "string",
+      "description": "ID định danh duy nhất từ nguồn (Ví dụ: cafef-123456). Dùng để tránh trùng lặp."
+    },
+    "source_name": {
+      "type": "string",
+      "enum": ["cafef", "vietstock", "tinnhanhchungkhoan"],
+      "description": "Tên nguồn dữ liệu."
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Link gốc bài viết."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 5,
+      "description": "Tiêu đề bài viết. Không được ngắn quá 5 ký tự."
+    },
+    "sapo": {
+      "type": "string",
+      "description": "Đoạn tóm tắt đầu bài (nếu có)."
+    },
+    "content_raw": {
+      "type": "string",
+      "description": "Nội dung thô (có thể còn dính ít HTML tag). Cần xử lý sau."
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Danh sách từ khóa: ['Vàng', 'BĐS']"
+    },
+    "author": {
+      "type": "string",
+      "description": "Tên tác giả bài viết."
+    },
+    "published_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Thời gian bài báo được đăng (Format ISO 8601: YYYY-MM-DDTHH:mm:ssZ)."
+    },
+    "crawled_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Thời gian Crawler của chúng ta thu thập tin này."
+    }
+  }
+}

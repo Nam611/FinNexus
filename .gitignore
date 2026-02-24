@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# Docker & Logs
+*.log
+docker-compose.override.yml
+
+# Streamlit secrets (Chúng ta sẽ cấu hình trên Web sau)
+.streamlit/secrets.toml

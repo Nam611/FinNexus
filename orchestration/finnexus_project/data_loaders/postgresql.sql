@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS public.news_articles CASCADE;

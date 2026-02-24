@@ -1,0 +1,1 @@
+{"source_id": "str", "source_name": "str", "title": "str", "url": "str", "content": "str", "collected_at": "str", "sentiment_score": "float64", "sentiment_label": "str", "tags": "list", "published_at": "datetime64[ns]", "tickers": "list"}

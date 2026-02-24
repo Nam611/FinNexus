@@ -1,0 +1,28 @@
+version: 0.1.1
+default:
+  # --- CẤU HÌNH DATABASE (POSTGRES) ---
+  POSTGRES_CONNECT_TIMEOUT: 10
+  POSTGRES_DBNAME: neondb       # Tên DB chuẩn
+  POSTGRES_SCHEMA: public
+  POSTGRES_USER: neondb_owner            # User chuẩn
+  POSTGRES_PASSWORD: npg_fby6LhI1giro        # Pass chuẩn
+  POSTGRES_HOST: ep-curly-dust-a1k3kq61-pooler.ap-southeast-1.aws.neon.tech      # Tên Container trong mạng Docker
+  POSTGRES_PORT: 5432
+
+  # 👇 THÊM ĐOẠN NÀY VÀO ĐỂ KẾT NỐI LOCAL
+local_db:
+  POSTGRES_CONNECT_TIMEOUT: 10
+  POSTGRES_DBNAME: "finnexus"
+  POSTGRES_SCHEMA: "public"
+  POSTGRES_USER: "admin"
+  POSTGRES_PASSWORD: "admin"
+  POSTGRES_HOST: "fn_postgres"
+  POSTGRES_PORT: 5432
+
+  # --- CẤU HÌNH KAFKA (Dự phòng) ---
+  KAFKA_BOOTSTRAP_SERVERS: fn_redpanda:9092
+  
+  # --- CẤU HÌNH MINIO (Dự phòng cho Data Lake sau này) ---
+  MINIO_ENDPOINT: fn_minio:9000
+  MINIO_ACCESS_KEY: admin
+  MINIO_SECRET_KEY: password

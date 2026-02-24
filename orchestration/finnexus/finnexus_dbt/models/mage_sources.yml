@@ -1,0 +1,14 @@
+sources:
+- description: Dataframes Mage upstream blocks
+  loader: mage
+  name: mage_finnexus_dbt
+  schema: public
+  tables:
+  - description: Dataframe for block `export_sentiment_to_postgres` of the `daily_financial_crawler`
+      mage pipeline.
+    identifier: mage_daily_financial_crawler_export_sentiment_to_postgres
+    meta:
+      block_uuid: export_sentiment_to_postgres
+      pipeline_uuid: daily_financial_crawler
+    name: daily_financial_crawler_export_sentiment_to_postgres
+version: 2

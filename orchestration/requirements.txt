@@ -1,0 +1,5 @@
+kafka-python
+minio
+pandas
+pyarrow
+psycopg2-binary

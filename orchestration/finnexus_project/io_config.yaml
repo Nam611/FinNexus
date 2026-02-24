@@ -1,0 +1,18 @@
+version: 0.1.1
+default:
+  # --- CẤU HÌNH DATABASE (POSTGRES) ---
+  POSTGRES_CONNECT_TIMEOUT: 10
+  POSTGRES_DBNAME: finnexus       # Tên DB chuẩn
+  POSTGRES_SCHEMA: public
+  POSTGRES_USER: admin            # User chuẩn
+  POSTGRES_PASSWORD: admin        # Pass chuẩn
+  POSTGRES_HOST: fn_postgres      # Tên Container trong mạng Docker
+  POSTGRES_PORT: 5432
+
+  # --- CẤU HÌNH KAFKA (Dự phòng) ---
+  KAFKA_BOOTSTRAP_SERVERS: fn_redpanda:9092
+  
+  # --- CẤU HÌNH MINIO (Dự phòng cho Data Lake sau này) ---
+  MINIO_ENDPOINT: fn_minio:9000
+  MINIO_ACCESS_KEY: admin
+  MINIO_SECRET_KEY: password

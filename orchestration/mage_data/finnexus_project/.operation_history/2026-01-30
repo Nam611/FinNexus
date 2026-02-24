@@ -1,0 +1,1 @@
+{"operation": "create", "resource": {"type": "pipeline", "uuid": "news_ingestion_pipeline"}, "timestamp": 1769792322, "user": null}

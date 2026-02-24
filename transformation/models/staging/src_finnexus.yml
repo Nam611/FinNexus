@@ -1,0 +1,35 @@
+version: 2
+
+sources:
+  - name: finnexus_source
+    database: finnexus
+    schema: public
+    tables:
+      - name: news_articles
+        description: "Dữ liệu tin tức thô"
+        columns:
+          - name: url
+            tests:
+              - unique  # Bắt lỗi nếu có 2 bài trùng link
+              - not_null # Bắt lỗi nếu link bị trống
+
+models: # Thêm phần này để test các model chúng ta vừa tạo
+  - name: stg_news_articles
+    columns:
+      - name: article_id
+        tests:
+          - unique
+          - not_null
+      - name: published_date
+        tests:
+          - not_null # QUAN TRỌNG: Nếu ngày bị NULL (như lỗi vừa nãy), dbt sẽ báo đỏ ngay!
+
+  - name: int_daily_sentiment
+    columns:
+      - name: report_date
+        tests:
+          - not_null
+          - unique:
+              config:
+                severity: warn 
+              # Cảnh báo nếu 1 ngày có 2 dòng (thường là do group by sai), nhưng không dừng pipeline

@@ -1,0 +1,44 @@
+/* assets/style.css */
+.stApp { font-family: 'Inter', sans-serif; }
+.stDeployButton { visibility: hidden; }
+header { visibility: visible; background: transparent; }
+
+/* Hiệu ứng Glassmorphism cho Card */
+.metric-card {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+.metric-card:hover { transform: translateY(-5px); }
+.metric-value { font-size: 2.2rem; font-weight: 800; margin: 5px 0; }
+.metric-label { font-size: 0.85rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; }
+
+/* News Feed */
+.news-container {
+    border-radius: 16px;
+    padding: 20px;
+    height: 600px;
+    overflow-y: auto;
+}
+.news-item {
+    padding: 15px; margin-bottom: 12px; border-radius: 10px;
+    background: rgba(128, 128, 128, 0.05);
+    transition: background 0.2s; border-left: 4px solid transparent;
+}
+.news-item:hover { background: rgba(128, 128, 128, 0.1); }
+.news-title a { text-decoration: none; font-weight: 600; font-size: 1rem; transition: color 0.2s; }
+
+/* Ticker Tag */
+.ticker-tag { 
+    background: linear-gradient(45deg, #2196F3, #21CBF3); color: white; 
+    padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; margin-right: 8px;
+    box-shadow: 0 2px 5px rgba(33, 150, 243, 0.3);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #888; border-radius: 3px; opacity: 0.5; }

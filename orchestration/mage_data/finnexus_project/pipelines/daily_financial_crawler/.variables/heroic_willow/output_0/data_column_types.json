@@ -1,0 +1,1 @@
+{"time": "datetime64[ns]", "open": "float64", "high": "float64", "low": "float64", "close": "float64", "volume": "int64", "ticker": "str", "Date": "datetime64[ns]", "Close": "float64"}

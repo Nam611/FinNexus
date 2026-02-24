@@ -1,0 +1,46 @@
+from mage_ai.streaming.sources.base_python import BasePythonSource
+from kafka import KafkaConsumer
+import json
+import time
+
+if 'streaming_source' not in globals():
+    from mage_ai.data_preparation.decorators import streaming_source
+
+@streaming_source
+class CustomKafkaSource(BasePythonSource):
+    def init_client(self):
+        """
+        Khởi tạo kết nối - Chạy 1 lần duy nhất khi Pipeline bắt đầu
+        """
+        self.consumer = KafkaConsumer(
+            'financial_news',
+            bootstrap_servers=['fn_redpanda:9092'],
+            # QUAN TRỌNG: Dòng này ép đọc lại từ tin đầu tiên
+            auto_offset_reset='earliest', 
+            enable_auto_commit=True,
+            # Đổi tên Group để Kafka tưởng là người mới -> Gửi lại toàn bộ data
+            group_id='finnexus_python_force_v1', 
+            value_deserializer=lambda x: json.loads(x.decode('utf-8'))
+        )
+        print("✅ Đã kết nối Kafka bằng Python Custom Source!")
+
+    def batch_read(self, handler):
+        """
+        Hàm này chạy vòng lặp liên tục để hút tin
+        """
+        try:
+            # Hút tối đa 100 tin mỗi lần quét (trong 1 giây)
+            data = self.consumer.poll(timeout_ms=1000, max_records=100)
+            
+            batch = []
+            for _, messages in data.items():
+                for msg in messages:
+                    batch.append(msg.value)
+            
+            if batch:
+                print(f"🚀 Tìm thấy {len(batch)} tin! Đang đẩy sang Transformer...")
+                # Đẩy dữ liệu sang block tiếp theo
+                handler(batch)
+                
+        except Exception as e:
+            print(f"💀 Lỗi đọc Kafka: {e}")
