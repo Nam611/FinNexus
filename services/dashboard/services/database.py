@@ -45,17 +45,31 @@ def load_correlation_data():
     conn = get_db_connection()
     if not conn: return pd.DataFrame()
     try:
-        # 3. Viết thường toàn bộ tên cột để fix lỗi "Close" does not exist
-        query = 'SELECT date, ticker, close, sentiment_score FROM public.market_correlation ORDER BY date ASC'
+        # TUYỆT CHIÊU: Lấy tất cả, không cần gọi đích danh tên cột để tránh lỗi hoa/thường
+        query = "SELECT * FROM public.market_correlation"
         df = pd.read_sql(query, conn)
         conn.close()
         
         if not df.empty:
-            # Đổi tên lại để Dashboard hiển thị đúng
-            df.columns = ['Date', 'Ticker', 'Close', 'Sentiment_Score']
+            # 1. Chuyển toàn bộ tên cột thực tế trong DB về chữ thường hết
+            df.columns = df.columns.str.lower()
+            
+            # 2. Đổi tên lại cho khớp chính xác với code Dashboard của Nam
+            df.rename(columns={
+                'ticker': 'Ticker', 
+                'close': 'Close', 
+                'sentiment_score': 'Sentiment_Score', 
+                'date': 'Date'
+            }, inplace=True)
+            
+            # 3. Ép kiểu dữ liệu để không bao giờ bị lỗi TypeError
             df['Date'] = pd.to_datetime(df['Date'])
             df['Close'] = pd.to_numeric(df['Close'], errors='coerce')
             df['Sentiment_Score'] = pd.to_numeric(df['Sentiment_Score'], errors='coerce')
+            
+            # 4. Sắp xếp lại theo thời gian
+            df = df.sort_values('Date', ascending=True)
+            
         return df
     except Exception as e:
         st.error(f"❌ Lỗi truy vấn Correlation: {e}")
