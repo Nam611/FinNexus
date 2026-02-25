@@ -51,29 +51,23 @@ def load_correlation_data():
         
         if df.empty: return df
         
-        # 1. Lưu lại danh sách tên cột gốc để báo cáo nếu thiếu
-        raw_columns = df.columns.tolist()
-        
-        # 2. Chuyển hết về chữ thường và đổi tên
+        # 1. Chuyển hết tên cột gốc về chữ thường
         df.columns = df.columns.str.lower()
+        
+        # 2. ĐỔI TÊN CHÍNH XÁC: Ánh xạ 'stock_price' thành 'Close'
         df.rename(columns={
             'ticker': 'Ticker', 
-            'close': 'Close', 
+            'stock_price': 'Close',  # 👈 TRỌNG TÂM LÀ Ở ĐÂY NÈ!
             'sentiment_score': 'Sentiment_Score', 
             'date': 'Date'
         }, inplace=True)
         
-        # 3. KIỂM TRA THÔNG MINH: Nếu không có cột Close thì báo lỗi rõ ràng ra màn hình
-        if 'Close' not in df.columns:
-            st.warning(f"⚠️ Dữ liệu Correlation bị thiếu cột giá đóng cửa. Các cột hiện có trên Neon DB là: {raw_columns}")
-            # Trả về DF rỗng tạm thời để Web không bị sập (Crash)
-            return pd.DataFrame()
-            
-        # 4. Nếu có đủ cột, tiến hành ép kiểu như bình thường
+        # 3. Ép kiểu dữ liệu để vẽ biểu đồ không bị lỗi
         df['Date'] = pd.to_datetime(df['Date'])
         df['Close'] = pd.to_numeric(df['Close'], errors='coerce')
         df['Sentiment_Score'] = pd.to_numeric(df['Sentiment_Score'], errors='coerce')
         
+        # 4. Sắp xếp lại theo thời gian
         return df.sort_values('Date', ascending=True)
         
     except Exception as e:
