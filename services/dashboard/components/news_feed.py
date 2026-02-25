@@ -1,12 +1,31 @@
 import streamlit as st
 import pandas as pd
 
-def show_news_feed(df: pd.DataFrame):
+def show_news_feed(df):
     st.markdown("### 📰 Dòng chảy Tin tức (Real-time)")
     
-    if df.empty:
-        st.info("Chưa có tin tức nào.")
-        return
+    # Tạo bản sao để không làm hỏng dữ liệu gốc
+    display_df = df.copy()
+    
+    # 🛠 FIX TẠI ĐÂY: Ép kiểu và xử lý dữ liệu trống
+    # Neon lưu là sentiment_label và sentiment_score
+    display_df['sentiment_label'] = display_df['sentiment_label'].fillna('NEUTRAL')
+    display_df['sentiment_score'] = pd.to_numeric(display_df['sentiment_score'], errors='coerce').fillna(0.0)
+    
+    # Chọn và đổi tên cột để hiển thị lên Dashboard
+    # Đảm bảo các cột này có tồn tại trong bảng news_articles trên Neon
+    output_df = display_df[['published_at', 'title', 'sentiment_label', 'sentiment_score', 'url']]
+    output_df.columns = ['Đăng lúc', 'Tiêu đề', 'Cảm xúc', 'Mức độ', 'Đọc ngay']
+    
+    st.dataframe(
+        output_df,
+        column_config={
+            "Đọc ngay": st.column_config.LinkColumn("Đọc ngay"),
+            "Mức độ": st.column_config.NumberColumn(format="%.2f")
+        },
+        use_container_width=True,
+        hide_index=True
+    )
 
     # 1. Tạo hàm tô màu (Highlight)
     def highlight_sentiment(val):
