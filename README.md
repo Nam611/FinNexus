@@ -1,8 +1,3 @@
-Dưới đây là bản dịch sang tiếng Anh chuyên nghiệp (Professional English), sử dụng đúng các thuật ngữ chuyên ngành Data Engineering và Software Engineering để làm nổi bật dự án của bạn trong mắt các nhà tuyển dụng quốc tế:
-
----
-
-```markdown
 # 📈 FinNexus 2.0: AI Financial Intelligence Platform
 
 ![Python](https://img.shields.io/badge/python-3.12-blue.svg)
